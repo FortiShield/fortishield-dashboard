@@ -1,5 +1,5 @@
 <div style="text-align:center">
-    <img src="https://fortishield.github.io/uploads/2022/05/Logo-blogpost.png"/>
+    <img src="https://opensearch.org/assets/brand/SVG/Logo/opensearch_dashboards_logo_darkmode.svg" height="64px"/>
 </div>
 
 - [Welcome!](#welcome)
