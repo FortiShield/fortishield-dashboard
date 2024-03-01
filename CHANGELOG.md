@@ -22,6 +22,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### 📝 Documentation
 
+- Fix link to documentation for geoHash precision ([#5967](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5967))
+
 ### 🛠 Maintenance
 
 ### 🪛 Refactoring
@@ -134,6 +136,8 @@ Inspired from [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Move @seanneumann to emeritus maintainer ([#5634](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5634))
 - Remove `ui-select` dev dependency ([#5660](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5660))
 - Bump `chromedriver` dependency to `121.0.1"` ([#5926](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5926))
+- Add @ruanyl as a maintainer ([#5982](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5982))
+- Add @BionIT as a maintainer ([#5988](https://github.com/opensearch-project/OpenSearch-Dashboards/pull/5988))
 
 ### 🪛 Refactoring
 
