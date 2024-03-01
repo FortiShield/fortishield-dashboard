@@ -35,7 +35,8 @@ import { i18n } from '@osd/i18n';
 import { Agent as HttpsAgent } from 'https';
 
 import Axios from 'axios';
-
+// @ts-expect-error untyped internal module used to prevent axios from using xhr adapter in tests
+import AxiosHttpAdapter from 'axios/lib/adapters/http';
 import { UiPlugins } from '../plugins';
 import { CoreContext } from '../core_context';
 import { Template } from './views';
@@ -123,6 +124,7 @@ export class RenderingService {
             version: env.packageInfo.version,
             buildNumber: env.packageInfo.buildNum,
             branch: env.packageInfo.branch,
+            fortishieldVersion: env.packageInfo.fortishieldVersion,
             basePath,
             serverBasePath,
             env,
@@ -376,7 +378,7 @@ export class RenderingService {
     }
     return await Axios.get(url, {
       httpsAgent: this.httpsAgent,
-      adapter: 'http',
+      adapter: AxiosHttpAdapter,
       maxRedirects: 0,
     })
       .then(() => {

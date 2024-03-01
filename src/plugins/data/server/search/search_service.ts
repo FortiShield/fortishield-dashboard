@@ -130,8 +130,7 @@ export class SearchService implements Plugin<ISearchSetup, ISearchStart> {
         this.initializerContext.config.legacy.globalConfig$,
         this.logger,
         usage,
-        dataSource,
-        core.opensearch
+        dataSource
       )
     );
 
@@ -142,7 +141,6 @@ export class SearchService implements Plugin<ISearchSetup, ISearchStart> {
         this.logger,
         usage,
         dataSource,
-        core.opensearch,
         true
       )
     );

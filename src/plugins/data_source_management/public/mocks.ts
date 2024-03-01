@@ -3,19 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
 import { throwError } from 'rxjs';
 import { SavedObjectsClientContract } from 'opensearch-dashboards/public';
 import { AuthType } from './types';
 import { coreMock } from '../../../core/public/mocks';
-import {
-  DataSourceManagementPlugin,
-  DataSourceManagementPluginSetup,
-  DataSourceManagementPluginStart,
-} from './plugin';
-import { managementPluginMock } from '../../management/public/mocks';
-import { mockManagementPlugin as indexPatternManagementPluginMock } from '../../index_pattern_management/public/mocks';
-import { AuthenticationMethod, AuthenticationMethodRegistery } from './auth_registry';
 
 /* Mock Types */
 
@@ -29,8 +20,6 @@ export const docLinks = {
     },
   },
 };
-
-export const authenticationMethodRegistery = new AuthenticationMethodRegistery();
 
 const createDataSourceManagementContext = () => {
   const {
@@ -53,7 +42,6 @@ const createDataSourceManagementContext = () => {
     http,
     docLinks,
     setBreadcrumbs: () => {},
-    authenticationMethodRegistery,
   };
 };
 
@@ -209,42 +197,3 @@ export const mockErrorResponseForSavedObjectsCalls = (
     throwError(new Error('Error while fetching data sources'))
   );
 };
-
-export interface TestPluginReturn {
-  setup: DataSourceManagementPluginSetup;
-  doStart: () => DataSourceManagementPluginStart;
-}
-
-export const testDataSourceManagementPlugin = (
-  coreSetup: any,
-  coreStart: any
-): TestPluginReturn => {
-  const plugin = new DataSourceManagementPlugin();
-  const setup = plugin.setup(coreSetup, {
-    management: managementPluginMock.createSetupContract(),
-    indexPatternManagement: indexPatternManagementPluginMock.createSetupContract(),
-    dataSource: {
-      dataSourceEnabled: true,
-      hideLocalCluster: true,
-      noAuthenticationTypeEnabled: true,
-      usernamePasswordAuthEnabled: true,
-      awsSigV4AuthEnabled: true,
-    },
-  });
-  const doStart = () => {
-    const start = plugin.start(coreStart);
-    return start;
-  };
-  return { setup, doStart };
-};
-
-export const createAuthenticationMethod = (
-  authMethod: Partial<AuthenticationMethod>
-): AuthenticationMethod => ({
-  name: 'unknown',
-  credentialForm: React.createElement('div', {}, 'Hello, world!'),
-  credentialSourceOption: {
-    value: 'unknown',
-  },
-  ...authMethod,
-});

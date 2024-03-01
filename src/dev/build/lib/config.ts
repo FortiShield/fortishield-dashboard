@@ -55,6 +55,7 @@ interface Package {
   workspaces: {
     packages: string[];
   };
+  fortishield: { version: string };
   [key: string]: unknown;
 }
 

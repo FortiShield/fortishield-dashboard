@@ -17,7 +17,6 @@ import { CreateDataSourceWizardWithRouter } from '../components/create_data_sour
 import { DataSourceTableWithRouter } from '../components/data_source_table';
 import { DataSourceManagementContext } from '../types';
 import { EditDataSourceWithRouter } from '../components/edit_data_source';
-import { AuthenticationMethodRegistery } from '../auth_registry';
 
 export interface DataSourceManagementStartDependencies {
   data: DataPublicPluginStart;
@@ -25,8 +24,7 @@ export interface DataSourceManagementStartDependencies {
 
 export async function mountManagementSection(
   getStartServices: StartServicesAccessor<DataSourceManagementStartDependencies>,
-  params: ManagementAppMountParams,
-  authMethodsRegistry: AuthenticationMethodRegistery
+  params: ManagementAppMountParams
 ) {
   const [
     { chrome, application, savedObjects, uiSettings, notifications, overlays, http, docLinks },
@@ -42,7 +40,6 @@ export async function mountManagementSection(
     http,
     docLinks,
     setBreadcrumbs: params.setBreadcrumbs,
-    authenticationMethodRegistery: authMethodsRegistry,
   };
 
   ReactDOM.render(

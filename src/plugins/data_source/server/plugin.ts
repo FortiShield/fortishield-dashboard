@@ -23,24 +23,19 @@ import { LoggingAuditor } from './audit/logging_auditor';
 import { CryptographyService, CryptographyServiceSetup } from './cryptography_service';
 import { DataSourceService, DataSourceServiceSetup } from './data_source_service';
 import { DataSourceSavedObjectsClientWrapper, dataSource } from './saved_objects';
-import { AuthenticationMethod, DataSourcePluginSetup, DataSourcePluginStart } from './types';
+import { DataSourcePluginSetup, DataSourcePluginStart } from './types';
 import { DATA_SOURCE_SAVED_OBJECT_TYPE } from '../common';
 
 // eslint-disable-next-line @osd/eslint/no-restricted-paths
 import { ensureRawRequest } from '../../../../src/core/server/http/router';
 import { createDataSourceError } from './lib/error';
 import { registerTestConnectionRoute } from './routes/test_connection';
-import { AuthenticationMethodRegistery, IAuthenticationMethodRegistery } from './auth_registry';
-import { CustomApiSchemaRegistry } from './schema_registry';
 
 export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourcePluginStart> {
   private readonly logger: Logger;
   private readonly cryptographyService: CryptographyService;
   private readonly dataSourceService: DataSourceService;
   private readonly config$: Observable<DataSourcePluginConfigType>;
-  private started = false;
-  private authMethodsRegistry = new AuthenticationMethodRegistery();
-  private customApiSchemaRegistry = new CustomApiSchemaRegistry();
 
   constructor(private initializerContext: PluginInitializerContext<DataSourcePluginConfigType>) {
     this.logger = this.initializerContext.logger.get();
@@ -49,7 +44,7 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
     this.config$ = this.initializerContext.config.create<DataSourcePluginConfigType>();
   }
 
-  public async setup(core: CoreSetup<DataSourcePluginStart>) {
+  public async setup(core: CoreSetup) {
     this.logger.debug('dataSource: Setup');
 
     // Register data source saved object type
@@ -100,17 +95,6 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
     const auditTrailPromise = core.getStartServices().then(([coreStart]) => coreStart.auditTrail);
 
     const dataSourceService: DataSourceServiceSetup = await this.dataSourceService.setup(config);
-
-    const authRegistryPromise = core.getStartServices().then(([, , selfStart]) => {
-      const dataSourcePluginStart = selfStart as DataSourcePluginStart;
-      return dataSourcePluginStart.getAuthenticationMethodRegistery();
-    });
-
-    const customApiSchemaRegistryPromise = core.getStartServices().then(([, , selfStart]) => {
-      const dataSourcePluginStart = selfStart as DataSourcePluginStart;
-      return dataSourcePluginStart.getCustomApiSchemaRegistry();
-    });
-
     // Register data source plugin context to route handler context
     core.http.registerRouteHandlerContext(
       'dataSource',
@@ -118,44 +102,22 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
         dataSourceService,
         cryptographyServiceSetup,
         this.logger,
-        auditTrailPromise,
-        authRegistryPromise,
-        customApiSchemaRegistryPromise
+        auditTrailPromise
       )
     );
 
     const router = core.http.createRouter();
-    registerTestConnectionRoute(
-      router,
-      dataSourceService,
-      cryptographyServiceSetup,
-      authRegistryPromise,
-      customApiSchemaRegistryPromise
-    );
-
-    const registerCredentialProvider = (method: AuthenticationMethod) => {
-      this.logger.debug(`Registered Credential Provider for authType = ${method.name}`);
-      if (this.started) {
-        throw new Error('cannot call `registerCredentialProvider` after service startup.');
-      }
-      this.authMethodsRegistry.registerAuthenticationMethod(method);
-    };
+    registerTestConnectionRoute(router, dataSourceService, cryptographyServiceSetup);
 
     return {
       createDataSourceError: (e: any) => createDataSourceError(e),
-      registerCredentialProvider,
-      registerCustomApiSchema: (schema: any) => this.customApiSchemaRegistry.register(schema),
-      dataSourceEnabled: () => config.enabled,
     };
   }
 
   public start(core: CoreStart) {
     this.logger.debug('dataSource: Started');
-    this.started = true;
-    return {
-      getAuthenticationMethodRegistery: () => this.authMethodsRegistry,
-      getCustomApiSchemaRegistry: () => this.customApiSchemaRegistry,
-    };
+
+    return {};
   }
 
   public stop() {
@@ -166,12 +128,9 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
     dataSourceService: DataSourceServiceSetup,
     cryptography: CryptographyServiceSetup,
     logger: Logger,
-    auditTrailPromise: Promise<AuditorFactory>,
-    authRegistryPromise: Promise<IAuthenticationMethodRegistery>,
-    customApiSchemaRegistryPromise: Promise<CustomApiSchemaRegistry>
+    auditTrailPromise: Promise<AuditorFactory>
   ): IContextProvider<RequestHandler<unknown, unknown, unknown>, 'dataSource'> => {
-    return async (context, req) => {
-      const authRegistry = await authRegistryPromise;
+    return (context, req) => {
       return {
         opensearch: {
           getClient: (dataSourceId: string) => {
@@ -183,9 +142,6 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
               dataSourceId,
               savedObjects: context.core.savedObjects.client,
               cryptography,
-              customApiSchemaRegistryPromise,
-              request: req,
-              authRegistry,
             });
           },
           legacy: {
@@ -194,9 +150,6 @@ export class DataSourcePlugin implements Plugin<DataSourcePluginSetup, DataSourc
                 dataSourceId,
                 savedObjects: context.core.savedObjects.client,
                 cryptography,
-                customApiSchemaRegistryPromise,
-                request: req,
-                authRegistry,
               });
             },
           },

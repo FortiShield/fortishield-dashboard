@@ -51,6 +51,7 @@ export interface RenderingMetadata {
     version: string;
     buildNumber: number;
     branch: string;
+    fortishieldVersion: string;
     basePath: string;
     serverBasePath: string;
     env: {

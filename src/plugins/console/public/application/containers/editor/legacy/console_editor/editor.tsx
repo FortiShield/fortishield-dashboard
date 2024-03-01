@@ -228,14 +228,10 @@ function EditorUI({ initialTextValue, dataSourceId }: EditorProps) {
     });
   }, [sendCurrentRequestToOpenSearch, openDocumentation]);
 
-  const tooltipDefaultMessage =
-    dataSourceId === undefined ? `Select a data source` : `Click to send request`;
-
-  const toolTipButtonDiasbled = dataSourceId === undefined;
-
   return (
     <div style={abs} className="conApp">
       <div className="conApp__editor">
+        <ul className="conApp__autoComplete" id="autocomplete" />
         <EuiFlexGroup
           className="conApp__editorActions"
           id="ConAppEditorActions"
@@ -245,17 +241,16 @@ function EditorUI({ initialTextValue, dataSourceId }: EditorProps) {
           <EuiFlexItem>
             <EuiToolTip
               content={i18n.translate('console.sendRequestButtonTooltip', {
-                defaultMessage: tooltipDefaultMessage,
+                defaultMessage: 'Click to send request',
               })}
             >
               <button
                 onClick={sendCurrentRequestToOpenSearch}
                 data-test-subj="sendRequestButton"
                 aria-label={i18n.translate('console.sendRequestButtonTooltip', {
-                  defaultMessage: tooltipDefaultMessage,
+                  defaultMessage: 'Click to send request',
                 })}
                 className="conApp__editorActionButton conApp__editorActionButton--success"
-                disabled={toolTipButtonDiasbled}
               >
                 <EuiIcon type="play" />
               </button>

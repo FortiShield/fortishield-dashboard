@@ -3,18 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export interface DataSourcePluginSetup {
-  dataSourceEnabled: boolean;
-  hideLocalCluster: boolean;
-  noAuthenticationTypeEnabled: boolean;
-  usernamePasswordAuthEnabled: boolean;
-  awsSigV4AuthEnabled: boolean;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DataSourcePluginSetup {}
 
-export interface DataSourcePluginStart {
-  dataSourceEnabled: boolean;
-  hideLocalCluster: boolean;
-  noAuthenticationTypeEnabled: boolean;
-  usernamePasswordAuthEnabled: boolean;
-  awsSigV4AuthEnabled: boolean;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DataSourcePluginStart {}

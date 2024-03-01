@@ -51,6 +51,9 @@ export const CreatePackageJson: Task = {
         distributable: true,
         release: config.isRelease,
       },
+      fortishield: {
+        version: pkg.fortishield.version,
+      },
       repository: pkg.repository,
       engines: {
         node: pkg.engines.node,

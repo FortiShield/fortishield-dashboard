@@ -154,7 +154,9 @@ export const Template: FunctionComponent<Props> = ({
               })}
             >
               {i18n('core.ui.welcomeMessage', {
-                defaultMessage: `Loading ${applicationTitle}`,
+                // Fortishield: change the default message to avoid
+                // showing the "Loading Fortishield" message twice.
+                defaultMessage: 'Loading ...',
               })}
             </div>
             {/* Show a progress bar if a static custom branded logo is used */}

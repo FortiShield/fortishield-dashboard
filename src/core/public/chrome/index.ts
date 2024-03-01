@@ -32,7 +32,6 @@ export {
   ChromeBadge,
   ChromeBreadcrumb,
   ChromeService,
-  ChromeSetup,
   ChromeStart,
   InternalChromeStart,
   ChromeHelpExtension,

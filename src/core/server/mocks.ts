@@ -116,6 +116,7 @@ function pluginInitializerContextMock<T>(config: T = {} as T) {
         buildNum: 100,
         buildSha: 'buildSha',
         dist: false,
+        fortishieldVersion: 'fortishieldVersion',
       },
       instanceUuid: 'instance-uuid',
     },

@@ -45,6 +45,7 @@ const packageInfo = {
   buildSha: '',
   version: '7.0.0-alpha1',
   dist: false,
+  fortishieldVersion: '4.0.0',
 };
 
 afterEach(() => {

@@ -43,12 +43,9 @@ import { ChromeService } from './chrome_service';
 import { getAppInfo } from '../application/utils';
 
 class FakeApp implements App {
-  public title: string;
+  public title = `${this.id} App`;
   public mount = () => () => {};
-
-  constructor(public id: string, public chromeless?: boolean) {
-    this.title = `${this.id} App`;
-  }
+  constructor(public id: string, public chromeless?: boolean) {}
 }
 const store = new Map();
 const originalLocalStorage = window.localStorage;
@@ -106,44 +103,6 @@ beforeEach(() => {
 
 afterAll(() => {
   (window as any).localStorage = originalLocalStorage;
-});
-
-describe('setup', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('register custom Nav Header render', async () => {
-    const customHeaderMock = React.createElement('TestCustomNavHeader');
-    const renderMock = jest.fn().mockReturnValue(customHeaderMock);
-    const chrome = new ChromeService({ browserSupportsCsp: true });
-
-    const chromeSetup = chrome.setup();
-    chromeSetup.registerCollapsibleNavHeader(renderMock);
-
-    const chromeStart = await chrome.start(defaultStartDeps());
-    const wrapper = shallow(React.createElement(() => chromeStart.getHeaderComponent()));
-    expect(wrapper.prop('collapsibleNavHeaderRender')).toBeDefined();
-    expect(wrapper.prop('collapsibleNavHeaderRender')()).toEqual(customHeaderMock);
-  });
-
-  it('should output warning message if calling `registerCollapsibleNavHeader` more than once', () => {
-    const warnMock = jest.fn();
-    jest.spyOn(console, 'warn').mockImplementation(warnMock);
-    const customHeaderMock = React.createElement('TestCustomNavHeader');
-    const renderMock = jest.fn().mockReturnValue(customHeaderMock);
-    const chrome = new ChromeService({ browserSupportsCsp: true });
-
-    const chromeSetup = chrome.setup();
-    // call 1st time
-    chromeSetup.registerCollapsibleNavHeader(renderMock);
-    // call 2nd time
-    chromeSetup.registerCollapsibleNavHeader(renderMock);
-    expect(warnMock).toHaveBeenCalledTimes(1);
-    expect(warnMock).toHaveBeenCalledWith(
-      '[ChromeService] An existing custom collapsible navigation bar header render has been overridden.'
-    );
-  });
 });
 
 describe('start', () => {

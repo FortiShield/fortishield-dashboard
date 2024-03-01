@@ -3,15 +3,15 @@
 
 name: Build and test
 
-# trigger on every commit push and PR for all branches except pushes for backport branches
+# trigger on every commit push and PR for all branches except feature branches and pushes for backport branches
 on:
   push:
-    branches: ['main', '[0-9].x', '[0-9].[0=9]+'] # Run the functional test on push for only release branches
+    branches: [ '**', '!feature/**', '!backport/**' ]
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
   pull_request:
-    branches: ['**']
+    branches: [ '**', '!feature/**' ]
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
@@ -497,7 +497,7 @@ jobs:
       - name: Run tests
         if: steps.verify-opensearch-exists.outputs.version-exists == 'true'
         run: |
-          ./bwctest.sh -s false -o ${{ env.OPENSEARCH_URL }} -d ${{ steps.download.outputs.download-path }}/opensearch-dashboards-${{ env.VERSION }}-linux-x64.tar.gz
+          yarn test:bwc -s false -o ${{ env.OPENSEARCH_URL }} -d ${{ steps.download.outputs.download-path }}/opensearch-dashboards-${{ env.VERSION }}-linux-x64.tar.gz -v ${{ matrix.version }}
 
       - uses: actions/upload-artifact@v3
         if: ${{ failure() && steps.verify-opensearch-exists.outputs.version-exists == 'true' }}

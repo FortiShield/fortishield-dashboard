@@ -32,7 +32,7 @@ import { deepFreeze } from '@osd/std';
 import { parse } from 'semver';
 import { InjectedMetadataSetup } from '../injected_metadata';
 
-export interface StartDeps {
+interface StartDeps {
   injectedMetadata: InjectedMetadataSetup;
 }
 
@@ -62,11 +62,17 @@ export class DocLinksService {
     const OPENSEARCH_WEBSITE_DOCS = `${OPENSEARCH_WEBSITE_URL}docs/${DOC_LINK_VERSION}`;
     const OPENSEARCH_VERSIONED_DOCS = `${OPENSEARCH_WEBSITE_DOCS}/opensearch/`;
     const OPENSEARCH_DASHBOARDS_VERSIONED_DOCS = `${OPENSEARCH_WEBSITE_DOCS}/dashboards/`;
+    const FORTISHIELD_DOC_VERSION = injectedMetadata.getFortishieldDocVersion();
+    const FORTISHIELD_WEBSITE_DOCS = `https://fortishield.github.io/documentation/${FORTISHIELD_DOC_VERSION}`;
 
     return deepFreeze({
       DOC_LINK_VERSION,
       OPENSEARCH_WEBSITE_URL,
+      FORTISHIELD_DOC_VERSION,
       links: {
+        fortishield: {
+          index: `${FORTISHIELD_WEBSITE_DOCS}/index.html`,
+        },
         opensearch: {
           // https://opensearch.org/docs/latest/opensearch/index/
           introduction: `${OPENSEARCH_VERSIONED_DOCS}index/`,
@@ -618,7 +624,11 @@ export class DocLinksService {
 export interface DocLinksStart {
   readonly DOC_LINK_VERSION: string;
   readonly OPENSEARCH_WEBSITE_URL: string;
+  readonly FORTISHIELD_DOC_VERSION: string;
   readonly links: {
+    readonly fortishield: {
+      readonly index: string;
+    };
     readonly opensearch: {
       readonly introduction: string;
       readonly installation: {

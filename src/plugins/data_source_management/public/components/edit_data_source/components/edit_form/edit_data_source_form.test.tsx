@@ -15,12 +15,7 @@ import {
 import { OpenSearchDashboardsContextProvider } from '../../../../../../opensearch_dashboards_react/public';
 import { EditDataSourceForm } from './edit_data_source_form';
 import { act } from 'react-dom/test-utils';
-import {
-  AuthType,
-  noAuthCredentialAuthMethod,
-  sigV4AuthMethod,
-  usernamePasswordAuthMethod,
-} from '../../../../types';
+import { AuthType } from '../../../../types';
 
 const titleFieldIdentifier = 'dataSourceTitle';
 const titleFormRowIdentifier = '[data-test-subj="editDataSourceTitleFormRow"]';
@@ -34,14 +29,6 @@ const passwordFieldIdentifier = '[data-test-subj="updateDataSourceFormPasswordFi
 const updatePasswordBtnIdentifier = '[data-test-subj="editDatasourceUpdatePasswordBtn"]';
 describe('Datasource Management: Edit Datasource Form', () => {
   const mockedContext = mockManagementPlugin.createDataSourceManagementContext();
-  mockedContext.authenticationMethodRegistery.registerAuthenticationMethod(
-    noAuthCredentialAuthMethod
-  );
-  mockedContext.authenticationMethodRegistery.registerAuthenticationMethod(
-    usernamePasswordAuthMethod
-  );
-  mockedContext.authenticationMethodRegistery.registerAuthenticationMethod(sigV4AuthMethod);
-
   let component: ReactWrapper<any, Readonly<{}>, React.Component<{}, {}, any>>;
   const mockFn = jest.fn();
 

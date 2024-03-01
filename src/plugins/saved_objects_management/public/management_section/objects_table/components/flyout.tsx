@@ -94,7 +94,6 @@ export interface FlyoutProps {
   http: HttpStart;
   search: DataPublicPluginStart['search'];
   dataSourceEnabled: boolean;
-  hideLocalCluster: boolean;
   savedObjects: SavedObjectsClientContract;
   notifications: NotificationsStart;
 }
@@ -822,7 +821,6 @@ export class Flyout extends Component<FlyoutProps, FlyoutState> {
             notifications={this.props.notifications.toasts}
             onSelectedDataSource={this.onSelectedDataSourceChange}
             disabled={!this.props.dataSourceEnabled}
-            hideLocalCluster={this.props.hideLocalCluster}
             fullWidth={true}
           />
         </EuiFormFieldset>
@@ -843,15 +841,10 @@ export class Flyout extends Component<FlyoutProps, FlyoutState> {
   }
 
   renderFooter() {
-    const { isLegacyFile, status, selectedDataSourceId } = this.state;
+    const { isLegacyFile, status } = this.state;
     const { done, close } = this.props;
 
     let confirmButton;
-
-    let importButtonDisabled = false;
-    if (this.props.dataSourceEnabled && this.props.hideLocalCluster && !selectedDataSourceId) {
-      importButtonDisabled = true;
-    }
 
     if (status === 'success') {
       confirmButton = (
@@ -884,7 +877,6 @@ export class Flyout extends Component<FlyoutProps, FlyoutState> {
           size="s"
           fill
           isLoading={status === 'loading'}
-          disabled={importButtonDisabled}
           data-test-subj="importSavedObjectsImportBtn"
         >
           <FormattedMessage

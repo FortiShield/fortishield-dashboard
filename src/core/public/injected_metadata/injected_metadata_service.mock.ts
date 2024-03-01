@@ -46,6 +46,8 @@ const createSetupContractMock = () => {
     getOpenSearchDashboardsBuildNumber: jest.fn(),
     getBranding: jest.fn(),
     getSurvey: jest.fn(),
+    getFortishieldVersion: jest.fn(),
+    getFortishieldDocVersion: jest.fn(),
   };
   setupContract.getCspConfig.mockReturnValue({ warnLegacyBrowsers: true });
   setupContract.getOpenSearchDashboardsVersion.mockReturnValue('opensearchDashboardsVersion');
@@ -62,6 +64,8 @@ const createSetupContractMock = () => {
     },
   } as any);
   setupContract.getPlugins.mockReturnValue([]);
+  setupContract.getFortishieldVersion.mockReturnValue('4.x.x');
+  setupContract.getFortishieldDocVersion.mockReturnValue('4.x');
   return setupContract;
 };
 

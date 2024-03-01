@@ -9,16 +9,12 @@ import { AuthType, DataSourceAttributes, SigV4ServiceName } from '../../common/d
 import { DataSourceConnectionValidator } from './data_source_connection_validator';
 import { DataSourceServiceSetup } from '../data_source_service';
 import { CryptographyServiceSetup } from '../cryptography_service';
-import { IAuthenticationMethodRegistery } from '../auth_registry';
 
-export const registerTestConnectionRoute = async (
+export const registerTestConnectionRoute = (
   router: IRouter,
   dataSourceServiceSetup: DataSourceServiceSetup,
-  cryptography: CryptographyServiceSetup,
-  authRegistryPromise: Promise<IAuthenticationMethodRegistery>,
-  customApiSchemaRegistryPromise: Promise<CustomApiSchemaRegistry>
+  cryptography: CryptographyServiceSetup
 ) => {
-  const authRegistry = await authRegistryPromise;
   router.post(
     {
       path: '/internal/data-source-management/validate',
@@ -67,9 +63,6 @@ export const registerTestConnectionRoute = async (
             cryptography,
             dataSourceId,
             testClientDataSourceAttr: dataSourceAttr as DataSourceAttributes,
-            request,
-            authRegistry,
-            customApiSchemaRegistryPromise,
           }
         );
 

@@ -20,7 +20,6 @@ import {
   EuiSuperSelect,
   EuiSpacer,
   EuiText,
-  EuiSuperSelectOption,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
@@ -28,6 +27,7 @@ import { SigV4Content, SigV4ServiceName } from '../../../../../../data_source/co
 import { Header } from '../header';
 import {
   AuthType,
+  credentialSourceOptions,
   DataSourceAttributes,
   DataSourceManagementContextValue,
   sigV4ServiceOptions,
@@ -71,16 +71,9 @@ export class EditDataSourceForm extends React.Component<EditDataSourceProps, Edi
   static contextType = contextType;
   public readonly context!: DataSourceManagementContextValue;
   maskedPassword: string = '********';
-  authOptions: Array<EuiSuperSelectOption<string>> = [];
 
   constructor(props: EditDataSourceProps, context: DataSourceManagementContextValue) {
     super(props, context);
-
-    this.authOptions = context.services.authenticationMethodRegistery
-      .getAllAuthenticationMethods()
-      .map((authMethod) => {
-        return authMethod.credentialSourceOption;
-      });
 
     this.state = {
       formErrorsByField: { ...defaultValidation },
@@ -779,10 +772,9 @@ export class EditDataSourceForm extends React.Component<EditDataSourceProps, Edi
           })}
         >
           <EuiSuperSelect
-            options={this.authOptions}
+            options={credentialSourceOptions}
             valueOfSelected={this.state.auth.type}
-            onChange={(value) => this.onChangeAuthType(value)}
-            disabled={this.authOptions.length <= 1}
+            onChange={this.onChangeAuthType}
             name="Credential"
             data-test-subj="editDataSourceSelectAuthType"
           />

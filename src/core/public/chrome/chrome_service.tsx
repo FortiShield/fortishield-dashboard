@@ -33,6 +33,7 @@ import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { BehaviorSubject, combineLatest, merge, Observable, of, ReplaySubject } from 'rxjs';
 import { flatMap, map, takeUntil } from 'rxjs/operators';
+import { parse } from 'url';
 import { EuiLink } from '@elastic/eui';
 import { mountReactNode } from '../utils/mount';
 import { InternalApplicationStart } from '../application';
@@ -89,7 +90,7 @@ interface ConstructorParams {
   browserSupportsCsp: boolean;
 }
 
-export interface StartDeps {
+interface StartDeps {
   application: InternalApplicationStart;
   docLinks: DocLinksStart;
   http: HttpStart;
@@ -97,8 +98,6 @@ export interface StartDeps {
   notifications: NotificationsStart;
   uiSettings: IUiSettingsClient;
 }
-
-type CollapsibleNavHeaderRender = () => JSX.Element | null;
 
 /** @internal */
 export class ChromeService {
@@ -109,7 +108,6 @@ export class ChromeService {
   private readonly navLinks = new NavLinksService();
   private readonly recentlyAccessed = new RecentlyAccessedService();
   private readonly docTitle = new DocTitleService();
-  private collapsibleNavHeaderRender?: CollapsibleNavHeaderRender;
 
   constructor(private readonly params: ConstructorParams) {}
 
@@ -122,7 +120,7 @@ export class ChromeService {
    */
   private initVisibility(application: StartDeps['application']) {
     // Start off the chrome service hidden if "embed" is in the hash query string.
-    const isEmbedded = new URL(location.hash.slice(1), location.origin).searchParams.has('embed');
+    const isEmbedded = 'embed' in parse(location.hash.slice(1), true).query;
     this.isForceHidden$ = new BehaviorSubject(isEmbedded);
 
     const appHidden$ = merge(
@@ -143,20 +141,6 @@ export class ChromeService {
       map(([appHidden, forceHidden]) => !appHidden && !forceHidden),
       takeUntil(this.stop$)
     );
-  }
-
-  public setup() {
-    return {
-      registerCollapsibleNavHeader: (render: CollapsibleNavHeaderRender) => {
-        if (this.collapsibleNavHeaderRender) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            '[ChromeService] An existing custom collapsible navigation bar header render has been overridden.'
-          );
-        }
-        this.collapsibleNavHeaderRender = render;
-      },
-    };
   }
 
   public async start({
@@ -260,13 +244,13 @@ export class ChromeService {
           basePath={http.basePath}
           breadcrumbs$={breadcrumbs$.pipe(takeUntil(this.stop$))}
           customNavLink$={customNavLink$.pipe(takeUntil(this.stop$))}
-          opensearchDashboardsDocLink={docLinks.links.opensearchDashboards.introduction}
+          opensearchDashboardsDocLink={docLinks.links.fortishield.index}
           forceAppSwitcherNavigation$={navLinks.getForceAppSwitcherNavigation$()}
           helpExtension$={helpExtension$.pipe(takeUntil(this.stop$))}
           helpSupportUrl$={helpSupportUrl$.pipe(takeUntil(this.stop$))}
-          homeHref={http.basePath.prepend('/app/home')}
+          homeHref={http.basePath.prepend('/app/wz-home')}
           isVisible$={this.isVisible$}
-          opensearchDashboardsVersion={injectedMetadata.getOpenSearchDashboardsVersion()}
+          opensearchDashboardsVersion={injectedMetadata.getFortishieldVersion()}
           navLinks$={navLinks.getNavLinks$()}
           recentlyAccessed$={recentlyAccessed.get$()}
           navControlsLeft$={navControls.getLeft$()}
@@ -279,7 +263,7 @@ export class ChromeService {
           branding={injectedMetadata.getBranding()}
           logos={logos}
           survey={injectedMetadata.getSurvey()}
-          collapsibleNavHeaderRender={this.collapsibleNavHeaderRender}
+          darkmode={uiSettings.get('theme:darkMode')}
         />
       ),
 
@@ -341,20 +325,6 @@ export class ChromeService {
     this.navLinks.stop();
     this.stop$.next();
   }
-}
-
-/**
- * ChromeSetup allows plugins to customize the global chrome header UI rendering
- * before the header UI is mounted.
- *
- * @example
- * Customize the Collapsible Nav's (left nav menu) header section:
- * ```ts
- * core.chrome.registerCollapsibleNavHeader(() => <CustomNavHeader />)
- * ```
- */
-export interface ChromeSetup {
-  registerCollapsibleNavHeader: (render: CollapsibleNavHeaderRender) => void;
 }
 
 /**

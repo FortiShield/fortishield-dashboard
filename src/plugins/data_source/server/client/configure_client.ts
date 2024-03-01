@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Client, ClientOptions } from '@opensearch-project/opensearch';
+import { Client, ClientOptions } from '@opensearch-project/opensearch-next';
 import { Client as LegacyClient } from 'elasticsearch';
 import { Credentials } from 'aws-sdk';
-import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
-import { Logger, OpenSearchDashboardsRequest } from '../../../../../src/core/server';
+import { AwsSigv4Signer } from '@opensearch-project/opensearch-next/aws';
+import { Logger } from '../../../../../src/core/server';
 import {
   AuthType,
   DataSourceAttributes,
@@ -27,19 +27,9 @@ import {
   getDataSource,
   generateCacheKey,
 } from './configure_client_utils';
-import { IAuthenticationMethodRegistery } from '../auth_registry';
-import { authRegistryCredentialProvider } from '../util/credential_provider';
 
 export const configureClient = async (
-  {
-    dataSourceId,
-    savedObjects,
-    cryptography,
-    testClientDataSourceAttr,
-    customApiSchemaRegistryPromise,
-    request,
-    authRegistry,
-  }: DataSourceClientParams,
+  { dataSourceId, savedObjects, cryptography, testClientDataSourceAttr }: DataSourceClientParams,
   openSearchClientPoolSetup: OpenSearchClientPoolSetup,
   config: DataSourcePluginConfigType,
   logger: Logger
@@ -74,18 +64,13 @@ export const configureClient = async (
       dataSourceId
     ) as Client;
 
-    const registeredSchema = (await customApiSchemaRegistryPromise).getAll();
-
     return await getQueryClient(
       dataSource,
       openSearchClientPoolSetup.addClientToPool,
       config,
-      registeredSchema,
       cryptography,
       rootClient,
       dataSourceId,
-      request,
-      authRegistry,
       requireDecryption
     );
   } catch (error: any) {
@@ -102,13 +87,10 @@ export const configureClient = async (
  *
  * @param rootClient root client for the given data source.
  * @param dataSourceAttr data source saved object attributes
- * @param registeredSchema registered API schema
  * @param cryptography cryptography service for password encryption / decryption
  * @param config data source config
  * @param addClientToPool function to add client to client pool
  * @param dataSourceId id of data source saved Object
- * @param request OpenSearch Dashboards incoming request to read client parameters from header.
- * @param authRegistry registry to retrieve the credentials provider for the authentication method in order to return the client
  * @param requireDecryption false when creating test client before data source exists
  * @returns Promise of query client
  */
@@ -116,34 +98,17 @@ const getQueryClient = async (
   dataSourceAttr: DataSourceAttributes,
   addClientToPool: (endpoint: string, authType: AuthType, client: Client | LegacyClient) => void,
   config: DataSourcePluginConfigType,
-  registeredSchema: any[],
   cryptography?: CryptographyServiceSetup,
   rootClient?: Client,
   dataSourceId?: string,
-  request?: OpenSearchDashboardsRequest,
-  authRegistry?: IAuthenticationMethodRegistery,
   requireDecryption: boolean = true
 ): Promise<Client> => {
-  let credential;
-  let {
+  const {
     auth: { type },
-    name,
+    endpoint,
   } = dataSourceAttr;
-  const { endpoint } = dataSourceAttr;
-  name = name ?? type;
-  const clientOptions = parseClientOptions(config, endpoint, registeredSchema);
+  const clientOptions = parseClientOptions(config, endpoint);
   const cacheKey = generateCacheKey(dataSourceAttr, dataSourceId);
-
-  const authenticationMethod = authRegistry?.getAuthenticationMethod(name);
-  if (authenticationMethod !== undefined) {
-    const credentialProvider = await authRegistryCredentialProvider(authenticationMethod, {
-      dataSourceAttr,
-      request,
-      cryptography,
-    });
-    credential = credentialProvider.credential;
-    type = credentialProvider.type;
-  }
 
   switch (type) {
     case AuthType.NoAuth:
@@ -153,11 +118,9 @@ const getQueryClient = async (
       return rootClient.child();
 
     case AuthType.UsernamePasswordType:
-      credential =
-        (credential as UsernamePasswordTypedContent) ??
-        (requireDecryption
-          ? await getCredential(dataSourceAttr, cryptography!)
-          : (dataSourceAttr.auth.credentials as UsernamePasswordTypedContent));
+      const credential = requireDecryption
+        ? await getCredential(dataSourceAttr, cryptography!)
+        : (dataSourceAttr.auth.credentials as UsernamePasswordTypedContent);
 
       if (!rootClient) rootClient = new Client(clientOptions);
       addClientToPool(cacheKey, type, rootClient);
@@ -165,13 +128,11 @@ const getQueryClient = async (
       return getBasicAuthClient(rootClient, credential);
 
     case AuthType.SigV4:
-      credential =
-        (credential as SigV4Content) ??
-        (requireDecryption
-          ? await getAWSCredential(dataSourceAttr, cryptography!)
-          : (dataSourceAttr.auth.credentials as SigV4Content));
+      const awsCredential = requireDecryption
+        ? await getAWSCredential(dataSourceAttr, cryptography!)
+        : (dataSourceAttr.auth.credentials as SigV4Content);
 
-      const awsClient = rootClient ? rootClient : getAWSClient(credential, clientOptions);
+      const awsClient = rootClient ? rootClient : getAWSClient(awsCredential, clientOptions);
       addClientToPool(cacheKey, type, awsClient);
 
       return awsClient;

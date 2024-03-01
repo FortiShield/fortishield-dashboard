@@ -56,7 +56,6 @@ interface DevToolsWrapperProps {
   savedObjects: SavedObjectsStart;
   notifications: NotificationsStart;
   dataSourceEnabled: boolean;
-  hideLocalCluster: boolean;
 }
 
 interface MountedDevToolDescriptor {
@@ -72,7 +71,6 @@ function DevToolsWrapper({
   savedObjects,
   notifications: { toasts },
   dataSourceEnabled,
-  hideLocalCluster,
 }: DevToolsWrapperProps) {
   const mountedTool = useRef<MountedDevToolDescriptor | null>(null);
 
@@ -138,7 +136,6 @@ function DevToolsWrapper({
               notifications={toasts}
               onSelectedDataSource={onChange}
               disabled={!dataSourceEnabled}
-              hideLocalCluster={hideLocalCluster}
               fullWidth={false}
             />
           </div>
@@ -156,12 +153,7 @@ function DevToolsWrapper({
               mountedTool.current.devTool !== activeDevTool ||
               mountedTool.current.mountpoint !== element)
           ) {
-            let initialDataSourceId;
-            if (!dataSourceEnabled || (dataSourceEnabled && !hideLocalCluster)) {
-              initialDataSourceId = '';
-            }
-
-            await remount(element, initialDataSourceId);
+            await remount(element);
           }
         }}
       />
@@ -220,7 +212,6 @@ export function renderApp(
   { dataSource }: DevToolsSetupDependencies
 ) {
   const dataSourceEnabled = !!dataSource;
-  const hideLocalCluster = dataSource?.hideLocalCluster ?? false;
   if (redirectOnMissingCapabilities(application)) {
     return () => {};
   }
@@ -250,7 +241,6 @@ export function renderApp(
                     savedObjects={savedObjects}
                     notifications={notifications}
                     dataSourceEnabled={dataSourceEnabled}
-                    hideLocalCluster={hideLocalCluster}
                   />
                 )}
               />

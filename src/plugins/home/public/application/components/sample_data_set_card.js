@@ -65,15 +65,6 @@ export class SampleDataSetCard extends React.Component {
   };
 
   renderBtn = () => {
-    const dataSourceEnabled = this.props.isDataSourceEnabled;
-    const hideLocalCluster = this.props.isLocalClusterHidden;
-    const dataSourceId = this.props.dataSourceId;
-
-    let buttonDisabled = false;
-    if (dataSourceEnabled && hideLocalCluster) {
-      buttonDisabled = dataSourceId === undefined;
-    }
-
     switch (this.props.status) {
       case INSTALLED_STATUS:
         return (
@@ -130,7 +121,6 @@ export class SampleDataSetCard extends React.Component {
           <EuiFlexGroup justifyContent="flexEnd">
             <EuiFlexItem grow={false}>
               <EuiButton
-                isDisabled={buttonDisabled}
                 isLoading={this.props.isProcessing}
                 onClick={this.install}
                 data-test-subj={`addSampleDataSet${this.props.id}`}
@@ -183,7 +173,7 @@ export class SampleDataSetCard extends React.Component {
                 }
               >
                 <EuiButton
-                  isDisabled={buttonDisabled}
+                  isDisabled
                   data-test-subj={`addSampleDataSet${this.props.id}`}
                   aria-label={i18n.translate('home.sampleDataSetCard.default.addButtonAriaLabel', {
                     defaultMessage: 'Add {datasetName}',

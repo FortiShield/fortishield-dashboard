@@ -53,6 +53,7 @@ export interface InjectedMetadataParams {
     version: string;
     buildNumber: number;
     branch: string;
+    fortishieldVersion: string;
     basePath: string;
     serverBasePath: string;
     category?: AppCategory;
@@ -90,10 +91,8 @@ export interface InjectedMetadataParams {
 export class InjectedMetadataService {
   private state: InjectedMetadataParams['injectedMetadata'];
 
-  constructor(private readonly params: InjectedMetadataParams) {
-    this.state = deepFreeze(
-      this.params.injectedMetadata
-    ) as InjectedMetadataParams['injectedMetadata'];
+  constructor(params: InjectedMetadataParams) {
+    this.state = deepFreeze(params.injectedMetadata) as InjectedMetadataParams['injectedMetadata'];
   }
 
   public start(): InjectedMetadataStart {
@@ -153,6 +152,14 @@ export class InjectedMetadataService {
       getSurvey: () => {
         return this.state.survey;
       },
+
+      getFortishieldVersion: () => {
+        return this.state.fortishieldVersion;
+      },
+
+      getFortishieldDocVersion: () => {
+        return this.state.fortishieldVersion?.split('.').slice(0, 2).join('.') || 'current';
+      },
     };
   }
 }
@@ -188,6 +195,8 @@ export interface InjectedMetadataSetup {
   };
   getBranding: () => Branding;
   getSurvey: () => string | undefined;
+  getFortishieldVersion: () => string;
+  getFortishieldDocVersion: () => string;
 }
 
 /** @internal */

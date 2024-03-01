@@ -82,8 +82,9 @@ export const getIndexPatternTitle = async (
   references: SavedObjectReference[],
   getDataSource: (id: string) => Promise<SavedObject<DataSourceAttributes>>
 ): Promise<string> => {
+  const DATA_SOURCE_INDEX_PATTERN_DELIMITER = '.';
   let dataSourceTitle;
-  const dataSourceReference = getDataSourceReference(references);
+  const dataSourceReference = references.find((ref) => ref.type === 'data-source');
 
   // If an index-pattern references datasource, prepend data source name with index pattern name for display purpose
   if (dataSourceReference) {
@@ -98,22 +99,10 @@ export const getIndexPatternTitle = async (
       // use datasource id as title when failing to fetch datasource
       dataSourceTitle = dataSourceId;
     }
-    return concatDataSourceWithIndexPattern(dataSourceTitle, indexPatternTitle);
+
+    return dataSourceTitle.concat(DATA_SOURCE_INDEX_PATTERN_DELIMITER).concat(indexPatternTitle);
   } else {
     // if index pattern doesn't reference datasource, return as it is.
     return indexPatternTitle;
   }
-};
-
-export const concatDataSourceWithIndexPattern = (
-  dataSourceTitle: string,
-  indexPatternTitle: string
-) => {
-  const DATA_SOURCE_INDEX_PATTERN_DELIMITER = '::';
-
-  return dataSourceTitle.concat(DATA_SOURCE_INDEX_PATTERN_DELIMITER).concat(indexPatternTitle);
-};
-
-export const getDataSourceReference = (references: SavedObjectReference[]) => {
-  return references.find((ref) => ref.type === 'data-source');
 };

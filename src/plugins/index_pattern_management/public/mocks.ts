@@ -53,9 +53,6 @@ const createSetupContract = (): IndexPatternManagementSetup => ({
   environment: {
     update: jest.fn(),
   },
-  columns: {
-    register: jest.fn(),
-  },
 });
 
 const createStartContract = (): IndexPatternManagementStart => ({

@@ -27,7 +27,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import fortishield from '../../../../package.json';
 
-export const OPENSEARCH_DASHBOARDS_ASK_OPENSEARCH_LINK = 'https://forum.opensearch.org/';
-export const GITHUB_CREATE_ISSUE_LINK =
-  'https://github.com/opensearch-project/OpenSearch-Dashboards/issues/new/choose';
+export const FORTISHIELD_MAJOR = fortishield.fortishield.version.split('.')[0];
+export const FORTISHIELD_MINOR = fortishield.fortishield.version.split('.')[1];
+
+export const OPENSEARCH_DASHBOARDS_FEEDBACK_LINK = 'https://fortishield.github.io/community/join-us-on-slack';
+export const OPENSEARCH_DASHBOARDS_ASK_OPENSEARCH_LINK = OPENSEARCH_DASHBOARDS_FEEDBACK_LINK;
+export const GITHUB_CREATE_ISSUE_LINK = 'https://github.com/fortishield/fortishield/issues/new/choose';
+export const FORTISHIELD_DOCUMENTATION_URL = `https://fortishield.github.io/documentation/${FORTISHIELD_MAJOR}.${FORTISHIELD_MINOR}/`;

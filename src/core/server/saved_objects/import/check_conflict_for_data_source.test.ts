@@ -72,6 +72,7 @@ describe('#checkConflictsForDataSource', () => {
       filteredObjects: [],
       errors: [],
       importIdMap: new Map(),
+      pendingOverwrites: new Set(),
     });
   });
 
@@ -82,6 +83,7 @@ describe('#checkConflictsForDataSource', () => {
       filteredObjects: [dataSourceObj1, dataSourceObj2],
       errors: [],
       importIdMap: new Map(),
+      pendingOverwrites: new Set(),
     });
   });
 
@@ -116,6 +118,10 @@ describe('#checkConflictsForDataSource', () => {
             { id: 'currentDsId_id-2', omitOriginId: true },
           ],
         ]),
+        pendingOverwrites: new Set([
+          `${dataSourceObj1.type}:${dataSourceObj1.id}`,
+          `${dataSourceObj2.type}:${dataSourceObj2.id}`,
+        ]),
       })
     );
   });
@@ -138,6 +144,7 @@ describe('#checkConflictsForDataSource', () => {
         },
       ],
       importIdMap: new Map(),
+      pendingOverwrites: new Set(),
     });
   });
 });

@@ -130,6 +130,7 @@ function pluginInitializerContextMock() {
         buildNum: 100,
         buildSha: 'buildSha',
         dist: false,
+        fortishieldVersion: 'fortishieldVersion',
       },
     },
     config: {
@@ -155,6 +156,7 @@ function createCoreContext(): CoreContext {
         buildNum: 100,
         buildSha: 'buildSha',
         dist: false,
+        fortishieldVersion: 'fortishieldVersion',
       },
     },
   };

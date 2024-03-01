@@ -53,133 +53,7 @@ import { getEndpointFromPosition } from '../../../../../lib/autocomplete/get_end
 import * as consoleMenuActions from '../console_menu_actions';
 import { Editor } from './editor';
 
-describe('Legacy (Ace) Console Editor Component Smoke Test with dataSourceId', () => {
-  let mockedAppContextValue: ContextValue;
-  const sandbox = sinon.createSandbox();
-
-  const doMount = () =>
-    mount(
-      <I18nProvider>
-        <ServicesContextProvider value={mockedAppContextValue}>
-          <RequestContextProvider>
-            <EditorContextProvider settings={{} as any}>
-              <Editor initialTextValue="" dataSourceId="Some dataSource Id" />
-            </EditorContextProvider>
-          </RequestContextProvider>
-        </ServicesContextProvider>
-      </I18nProvider>
-    );
-
-  beforeEach(() => {
-    document.queryCommandSupported = sinon.fake(() => true);
-    mockedAppContextValue = serviceContextMock.create();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    sandbox.restore();
-  });
-
-  it('calls send current request to OpenSearch', async () => {
-    (getEndpointFromPosition as jest.Mock).mockReturnValue({ patterns: [] });
-    (sendRequestToOpenSearch as jest.Mock).mockRejectedValue({});
-    const editor = doMount();
-    act(() => {
-      editor.find('[data-test-subj~="sendRequestButton"]').simulate('click');
-    });
-    await nextTick();
-    expect(sendRequestToOpenSearch).toBeCalledTimes(1);
-  });
-
-  it('opens docs', () => {
-    const stub = sandbox.stub(consoleMenuActions, 'getDocumentation');
-    const editor = doMount();
-    const consoleMenuToggle = editor.find('[data-test-subj~="toggleConsoleMenu"]').last();
-    consoleMenuToggle.simulate('click');
-
-    const docsButton = editor.find('[data-test-subj~="consoleMenuOpenDocs"]').last();
-    docsButton.simulate('click');
-
-    expect(stub.callCount).toBe(1);
-  });
-
-  it('prompts auto-indent', () => {
-    const stub = sandbox.stub(consoleMenuActions, 'autoIndent');
-    const editor = doMount();
-    const consoleMenuToggle = editor.find('[data-test-subj~="toggleConsoleMenu"]').last();
-    consoleMenuToggle.simulate('click');
-
-    const autoIndentButton = editor.find('[data-test-subj~="consoleMenuAutoIndent"]').last();
-    autoIndentButton.simulate('click');
-
-    expect(stub.callCount).toBe(1);
-  });
-});
-
-describe('Legacy (Ace) Console Editor Component Smoke Test with empty dataSourceId (Local Cluster)', () => {
-  let mockedAppContextValue: ContextValue;
-  const sandbox = sinon.createSandbox();
-
-  const doMount = () =>
-    mount(
-      <I18nProvider>
-        <ServicesContextProvider value={mockedAppContextValue}>
-          <RequestContextProvider>
-            <EditorContextProvider settings={{} as any}>
-              <Editor initialTextValue="" dataSourceId="" />
-            </EditorContextProvider>
-          </RequestContextProvider>
-        </ServicesContextProvider>
-      </I18nProvider>
-    );
-
-  beforeEach(() => {
-    document.queryCommandSupported = sinon.fake(() => true);
-    mockedAppContextValue = serviceContextMock.create();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    sandbox.restore();
-  });
-
-  it('calls send current request to OpenSearch', async () => {
-    (getEndpointFromPosition as jest.Mock).mockReturnValue({ patterns: [] });
-    (sendRequestToOpenSearch as jest.Mock).mockRejectedValue({});
-    const editor = doMount();
-    act(() => {
-      editor.find('[data-test-subj~="sendRequestButton"]').simulate('click');
-    });
-    await nextTick();
-    expect(sendRequestToOpenSearch).toBeCalledTimes(1);
-  });
-
-  it('opens docs', () => {
-    const stub = sandbox.stub(consoleMenuActions, 'getDocumentation');
-    const editor = doMount();
-    const consoleMenuToggle = editor.find('[data-test-subj~="toggleConsoleMenu"]').last();
-    consoleMenuToggle.simulate('click');
-
-    const docsButton = editor.find('[data-test-subj~="consoleMenuOpenDocs"]').last();
-    docsButton.simulate('click');
-
-    expect(stub.callCount).toBe(1);
-  });
-
-  it('prompts auto-indent', () => {
-    const stub = sandbox.stub(consoleMenuActions, 'autoIndent');
-    const editor = doMount();
-    const consoleMenuToggle = editor.find('[data-test-subj~="toggleConsoleMenu"]').last();
-    consoleMenuToggle.simulate('click');
-
-    const autoIndentButton = editor.find('[data-test-subj~="consoleMenuAutoIndent"]').last();
-    autoIndentButton.simulate('click');
-
-    expect(stub.callCount).toBe(1);
-  });
-});
-
-describe('Legacy (Ace) Console Editor Component Smoke Test with dataSouceId undefined', () => {
+describe('Legacy (Ace) Console Editor Component Smoke Test', () => {
   let mockedAppContextValue: ContextValue;
   const sandbox = sinon.createSandbox();
 
@@ -206,14 +80,7 @@ describe('Legacy (Ace) Console Editor Component Smoke Test with dataSouceId unde
     sandbox.restore();
   });
 
-  it('diasbles send request button', async () => {
-    (getEndpointFromPosition as jest.Mock).mockReturnValue({ patterns: [] });
-    (sendRequestToOpenSearch as jest.Mock).mockRejectedValue({});
-    const editor = doMount();
-    expect(editor.find('[data-test-subj~="sendRequestButton"]').get(0).props.disabled);
-  });
-
-  it('not able to send current request to OpenSearch', async () => {
+  it('calls send current request to OpenSearch', async () => {
     (getEndpointFromPosition as jest.Mock).mockReturnValue({ patterns: [] });
     (sendRequestToOpenSearch as jest.Mock).mockRejectedValue({});
     const editor = doMount();
@@ -221,7 +88,7 @@ describe('Legacy (Ace) Console Editor Component Smoke Test with dataSouceId unde
       editor.find('[data-test-subj~="sendRequestButton"]').simulate('click');
     });
     await nextTick();
-    expect(sendRequestToOpenSearch).toBeCalledTimes(0);
+    expect(sendRequestToOpenSearch).toBeCalledTimes(1);
   });
 
   it('opens docs', () => {
