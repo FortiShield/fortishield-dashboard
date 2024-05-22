@@ -20,7 +20,7 @@
     "autoprefixer": "^10.4.1",
     "clean-webpack-plugin": "^3.0.0",
     "compression-webpack-plugin": "npm:@amoo-miki/compression-webpack-plugin@4.0.1-rc.1",
-    "cpy": "^8.0.0",
+    "cpy": "^9.0.0",
     "core-js": "^3.6.5",
     "dedent": "^0.7.0",
     "del": "^6.1.1",
