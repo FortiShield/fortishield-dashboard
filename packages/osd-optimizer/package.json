@@ -24,7 +24,7 @@
     "core-js": "^3.6.5",
     "dedent": "^0.7.0",
     "del": "^6.1.1",
-    "execa": "^4.0.2",
+    "execa": "^9.6.0",
     "jest-diff": "^27.5.1",
     "js-yaml": "^4.1.0",
     "json-stable-stringify": "^1.0.1",
